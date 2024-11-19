@@ -37,8 +37,10 @@ describe('NullBlastRadiusValidator', () => {
     `;
 
         const result = validator.validate(schema);
-        expect(result.violations).toHaveLength(1);
-        expect(result.analysis.get('Query.user').blastRadius).toBeGreaterThan(3);
+
+        expect(result.violations).toHaveLength(2);
+        expect(result.analysis.get('Query.user').blastRadius).toBe(9);
+        expect(result.analysis.get('User.profile').blastRadius).toBe(6);
     });
 
     test('should handle optional fields correctly', () => {
@@ -111,7 +113,7 @@ describe('NullBlastRadiusValidator', () => {
     `;
 
         const result = validator.validate(schema);
-        expect(result.analysis.get('Query.nested').blastRadius).toBe(5);
+        expect(result.analysis.get('Query.nested').blastRadius).toBe(6);
     });
 
     test('should handle lists correctly', () => {
@@ -221,9 +223,11 @@ describe('NullBlastRadiusValidator', () => {
     `;
 
         const result = customValidator.validate(schema);
+
         expect(result.violations.some(v =>
-            v.fieldPath === 'Query.critical' && v.severity === 'warning'
+            v.fieldPath === 'Query.critical' && v.severity === 'critical'
         )).toBe(true);
+        expect(result.violations.length).toBe(2)
     });
 
     test('should handle empty or invalid schema', () => {

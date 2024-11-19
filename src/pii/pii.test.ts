@@ -86,9 +86,14 @@ describe('GraphQL PII Field Validator', () => {
     `;
 
         const result = validatePIIFields(schema);
-
         expect(result.markedPIIFields).toHaveLength(4);
-        expect(result.potentialUnmarkedPIIFields).toHaveLength(0);
+        expect(result.potentialUnmarkedPIIFields).toHaveLength(1);
+        expect(result.potentialUnmarkedPIIFields).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ field: 'address', status: 'potentially_missing_pii_directive' }),
+            ])
+        );
+
         expect(result.markedPIIFields).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({ field: 'email', status: 'correctly_marked' }),

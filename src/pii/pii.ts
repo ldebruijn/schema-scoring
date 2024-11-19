@@ -18,6 +18,7 @@ export function validatePIIFields(schemaString) {
         /email/i,
         /phone/i,
         /address/i,
+        /street/i,
         /ssn/i,
         /social.*security/i,
         /passport/i,

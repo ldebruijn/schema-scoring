@@ -1,12 +1,13 @@
-import {buildSchema, parse, visit} from "graphql";
+import {parse, visit} from "graphql";
 
 export class CompositeKeyValidator {
+    private maxCompositeKeys: number;
+
     constructor(maxCompositeKeys = 3) {
         this.maxCompositeKeys = maxCompositeKeys;
     }
 
-    validateSchema(schemaString) {
-        const schema = buildSchema(schemaString);
+    validateSchema(schemaString: string) {
         const ast = parse(schemaString);
         const violations = [];
 

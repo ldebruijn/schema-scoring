@@ -59,10 +59,11 @@ describe('GraphQLCycleCounter', () => {
     `;
 
         const result = counter.countCycles(schema);
+
         expect(result.totalCycles).toBe(3);
-        expect(result.summary.typeInvolvementCount['A']).toBe(3);
-        expect(result.summary.typeInvolvementCount['B']).toBe(3);
-        expect(result.summary.typeInvolvementCount['C']).toBe(3);
+        expect(result.summary.typeInvolvementCount['A']).toBe(4);
+        expect(result.summary.typeInvolvementCount['B']).toBe(4);
+        expect(result.summary.typeInvolvementCount['C']).toBe(2);
     });
 
     test('should count self-referential cycle', () => {

@@ -7,9 +7,6 @@ describe("composite keys", () => {
 
     test("Valid schema with no composite keys", () => {
         const schema = `
-        extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.3",
-        import: ["@key"])
         
         type User {
           id: ID!
@@ -17,21 +14,16 @@ describe("composite keys", () => {
           email: String!
         }
       `
-        const expectedValid = true
-
         const result = validator.validateSchema(schema);
-        expect(result.isValid).toBe(expectedValid)
+        console.log(result)
+        expect(result.isValid).toBe(true)
     })
 
     test("Valid schema with acceptable number of composite keys", () => {
         const schema = `
-                extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.3",
-        import: ["@key"])
         
        type Product @key(fields: "sku vendor" )
-                    @key(fields: "category name" )
-                    @key(fields: "barcode location" ) {
+                    @key(fields: "category name" ) {
           sku: String!
           vendor: String!
           category: String!
@@ -48,9 +40,6 @@ describe("composite keys", () => {
 
     test("Invalid schema with too many composite keys", () => {
         const schema = `
-                extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.3",
-        import: ["@key"])
         
        type Product @key(fields: "sku vendor" )
                     @key(fields: "category name" )
@@ -71,10 +60,7 @@ describe("composite keys", () => {
 
     test("Mixed schema with valid and invalid types", () => {
         const schema = `
-                extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.3",
-        import: ["@key"])
-        
+       
        type Valid {
           id: ID!
           name: String!

@@ -1,7 +1,14 @@
-import {buildSchema, parse, visit} from "graphql";
+import {buildSchema, type DocumentNode, parse, visit} from "graphql";
 
 export class NullBlastRadiusValidator {
-    constructor(config = {}) {
+    private config: { maxBlastRadius: number; criticalTypePaths: number; warningThreshold: number };
+    private typeMap: Map<any, any>;
+    private nullabilityGraph: Map<any, any>;
+    constructor(config = {
+        maxBlastRadius: 5,
+        criticalTypePaths: [],
+        warningThreshold: 3
+    }) {
         this.config = {
             maxBlastRadius: config.maxBlastRadius || 5, // Maximum acceptable number of affected fields
             criticalTypePaths: config.criticalTypePaths || [], // Paths that are considered business-critical
@@ -12,8 +19,7 @@ export class NullBlastRadiusValidator {
         this.nullabilityGraph = new Map();
     }
 
-    validate(schemaString) {
-        const schema = buildSchema(schemaString);
+    validate(schemaString: string) {
         const ast = parse(schemaString);
 
         // Reset state
@@ -33,7 +39,7 @@ export class NullBlastRadiusValidator {
         };
     }
 
-    buildNullabilityGraph(ast) {
+    buildNullabilityGraph(ast: DocumentNode) {
         let currentType = null;
         let currentField = null;
 
