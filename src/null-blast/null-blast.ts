@@ -5,23 +5,16 @@ export class NullBlastRadiusValidator {
     private typeMap: Map<any, any>;
     private nullabilityGraph: Map<any, any>;
     constructor(config = {
-        maxBlastRadius: 5,
-        criticalTypePaths: [],
-        warningThreshold: 3
+        maxBlastRadius: 5, // Maximum acceptable number of affected fields
+        criticalTypePaths: [], // Paths that are considered business-critical
+        warningThreshold: 3 // Threshold for warning level blast radius
     }) {
-        this.config = {
-            maxBlastRadius: config.maxBlastRadius || 5, // Maximum acceptable number of affected fields
-            criticalTypePaths: config.criticalTypePaths || [], // Paths that are considered business-critical
-            warningThreshold: config.warningThreshold || 3, // Threshold for warning level blast radius
-            ...config
-        };
+        this.config = config;
         this.typeMap = new Map();
         this.nullabilityGraph = new Map();
     }
 
-    validate(schemaString: string) {
-        const ast = parse(schemaString);
-
+    validate(ast: DocumentNode) {
         // Reset state
         this.typeMap.clear();
         this.nullabilityGraph.clear();

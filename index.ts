@@ -1,3 +1,11 @@
-console.log("Hello via Bun!");
+import {Validator} from "./src/validator/validator.ts";
 
-import {} from "./src/null-blast/null-blast"
+console.log("Lets score some schemas!");
+
+const contents = Bun.file('./schema.graphqls')
+
+const schema = await contents.text()
+
+const validator = new Validator(schema)
+
+validator.validate()

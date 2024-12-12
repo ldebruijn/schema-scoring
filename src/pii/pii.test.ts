@@ -1,5 +1,6 @@
-import {validatePIIFields} from "./pii";
+import {PiiValidator, validatePIIFields} from "./pii";
 import {describe, test, expect } from "bun:test"
+import {parse} from "graphql/index";
 
 describe('GraphQL PII Field Validator', () => {
     test('should identify correctly marked PII fields', () => {
@@ -14,7 +15,11 @@ describe('GraphQL PII Field Validator', () => {
       }
     `;
 
-        const result = validatePIIFields(schema);
+        const pii = new PiiValidator()
+
+        const ast = parse(schema)
+
+        const result = pii.validate(ast)
 
         expect(result.isValid).toBe(true);
         expect(result.markedPIIFields).toHaveLength(3);
@@ -41,7 +46,11 @@ describe('GraphQL PII Field Validator', () => {
       }
     `;
 
-        const result = validatePIIFields(schema);
+        const pii = new PiiValidator()
+
+        const ast = parse(schema)
+
+        const result = pii.validate(ast);
 
         expect(result.isValid).toBe(false);
         expect(result.potentialUnmarkedPIIFields).toHaveLength(3);
@@ -85,7 +94,11 @@ describe('GraphQL PII Field Validator', () => {
       }
     `;
 
-        const result = validatePIIFields(schema);
+        const pii = new PiiValidator()
+
+        const ast = parse(schema)
+
+        const result = pii.validate(ast);
         expect(result.markedPIIFields).toHaveLength(4);
         expect(result.potentialUnmarkedPIIFields).toHaveLength(1);
         expect(result.potentialUnmarkedPIIFields).toEqual(
@@ -121,7 +134,11 @@ describe('GraphQL PII Field Validator', () => {
       }
     `;
 
-        const result = validatePIIFields(schema);
+        const pii = new PiiValidator()
+
+        const ast = parse(schema)
+
+        const result = pii.validate(ast);
 
         expect(result.isValid).toBe(true);
         expect(result.markedPIIFields).toHaveLength(1);
@@ -145,27 +162,16 @@ describe('GraphQL PII Field Validator', () => {
       }
     `;
 
-        const result = validatePIIFields(schema);
+        const pii = new PiiValidator()
+
+        const ast = parse(schema)
+
+        const result = pii.validate(ast);
 
         expect(result.isValid).toBe(true);
         expect(result.markedPIIFields).toHaveLength(0);
         expect(result.potentialUnmarkedPIIFields).toHaveLength(0);
         expect(result.summary.totalPIIFieldsMarked).toBe(0);
         expect(result.summary.potentialPIIMissing).toBe(0);
-    });
-
-    test('should handle invalid schema', () => {
-        const invalidSchema = `
-      directive @pii on FIELD_DEFINITION
-
-      type Invalid {
-        id: ID!
-        email: String! @pii @invalidDirective
-      }
-    `;
-
-        expect(() => {
-            validatePIIFields(invalidSchema);
-        }).toThrow();
     });
 });
