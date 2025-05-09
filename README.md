@@ -1,4 +1,10 @@
-# schema-check
+# schema-score
+
+A Proof of Concept for scoring GraphQL schemas according to a number of rules.
+
+_Never finished_
+
+## Installation.
 
 To install dependencies:
 
