@@ -1,11 +1,16 @@
-import {Validator} from "./src/validator/validator.ts";
+import {Validator} from "./src/validator.ts";
 
-console.log("Lets score some schemas!");
+const filePath = process.argv[2];
 
-const contents = Bun.file('./schema.graphqls')
+if (!filePath) {
+    console.error("Please provide a path to a GraphQL schema file.");
+    process.exit(1);
+}
 
-const schema = await contents.text()
+console.log(`Loading schema from ${filePath}...`);
 
-const validator = new Validator(schema)
+const contents = await Bun.file(filePath).text()
+
+const validator = new Validator(contents)
 
 validator.validate()
