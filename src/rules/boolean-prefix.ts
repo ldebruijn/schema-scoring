@@ -1,5 +1,5 @@
 import {type DocumentNode, visit} from "graphql";
-import {Rule, ValidationResult} from "../model.ts";
+import type {Rule, ValidationResult} from "../model.ts";
 
 export class BooleanPrefixRule implements Rule {
     name = "Boolean Prefix";
