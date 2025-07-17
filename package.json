@@ -1,12 +1,14 @@
 {
   "dependencies": {
-    "graphql": "^16.9.0"
+    "graphql": "^16.9.0",
+    "pluralize": "^8.0.0"
   },
   "name": "schema-score",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/pluralize": "^0.0.33"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
