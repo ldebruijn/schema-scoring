@@ -1,10 +1,8 @@
 # schema-score
 
-A Proof of Concept for scoring GraphQL schemas according to a number of rules.
+A tool for scoring GraphQL schemas based on a set of rules. This tool helps to enforce best practices and maintain a healthy GraphQL schema.
 
-_Never finished_
-
-## Installation.
+## Installation
 
 To install dependencies:
 
@@ -12,10 +10,14 @@ To install dependencies:
 bun install
 ```
 
-To run:
+## Usage
+
+To run the schema scorer, provide a path to a GraphQL schema file:
 
 ```bash
-bun run index.ts
+bun run index.ts <path-to-schema>.graphql
 ```
 
-This project was created using `bun init` in bun v1.1.34. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Rules
+
+The schema scorer uses a set of rules to evaluate the schema. Each rule has a weight, and the final score is calculated based on the number of violations and their respective weights. For more information on the rules, see [RULES.md](RULES.md).
