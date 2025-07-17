@@ -6,9 +6,9 @@ This document outlines the rules used by the schema scorer to evaluate GraphQL s
 
 The final score is calculated using the following formula:
 
-`score = 100 - SUM(rule.weight * (rule.violations ^ 1.5))`
+`score = 100 * (1 - (SUM(rule.weight * (violations ^ 1.5)) / total_fields))`
 
-This formula ensures that a few violations will only slightly lower the score, but a larger number of violations will have a much more significant impact.
+This formula ensures that a few violations will only slightly lower the score, but a larger number of violations will have a much more significant impact. The score is also normalized by the size of the schema, so that larger schemas are not unfairly penalized.
 
 ## Deprecation
 

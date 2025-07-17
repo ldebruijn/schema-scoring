@@ -1,4 +1,4 @@
-import {parse} from "graphql/index";
+import {parse, visit} from "graphql/index";
 import type {DocumentNode} from "graphql";
 import {PiiRule} from "./rules/pii.ts";
 import {Rule} from "./model.ts";
@@ -31,22 +31,33 @@ export class Validator {
     }
 
     validate() {
-        let score = 100;
+        const totalFields = this.getTotalFields();
+        let totalWeightedViolations = 0;
 
-        for (let i = this.rules.length - 1; i >= 0; i--) {
-            const rule = this.rules[i]
-
+        for (const rule of this.rules) {
             console.log(`Running validator [${rule.constructor.name}]`)
 
             const result = rule.validate(this.ast)
 
             if (result.violations > 0) {
-                score -= rule.weight * Math.pow(result.violations, 1.5);
+                totalWeightedViolations += rule.weight * Math.pow(result.violations, 1.5);
             }
 
             console.log(result)
         }
 
+        const score = 100 * (1 - (totalWeightedViolations / totalFields));
+
         console.log(`Schema score: ${score}`)
+    }
+
+    private getTotalFields(): number {
+        let totalFields = 0;
+        visit(this.ast, {
+            FieldDefinition() {
+                totalFields++;
+            }
+        });
+        return totalFields;
     }
 }
