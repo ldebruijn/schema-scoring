@@ -2,6 +2,14 @@
 
 This document outlines the rules used by the schema scorer to evaluate GraphQL schemas.
 
+## Scoring
+
+The final score is calculated using the following formula:
+
+`score = 100 - SUM(rule.weight * (rule.violations ^ 1.5))`
+
+This formula ensures that a few violations will only slightly lower the score, but a larger number of violations will have a much more significant impact.
+
 ## Deprecation
 
 - **Description**: Enforces that deprecated fields have a valid reason, including a deprecation date and a migration path.

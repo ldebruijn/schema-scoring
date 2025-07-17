@@ -18,6 +18,14 @@ To run the schema scorer, provide a path to a GraphQL schema file:
 bun run index.ts <path-to-schema>.graphql
 ```
 
+## Scoring
+
+The final score is calculated using the following formula:
+
+`score = 100 - SUM(rule.weight * (rule.violations ^ 1.5))`
+
+This formula ensures that a few violations will only slightly lower the score, but a larger number of violations will have a much more significant impact.
+
 ## Rules
 
 The schema scorer uses a set of rules to evaluate the schema. Each rule has a weight, and the final score is calculated based on the number of violations and their respective weights. For more information on the rules, see [RULES.md](RULES.md).
