@@ -44,7 +44,7 @@ export class Validator {
 
         for (const rule of this.rules) {
             if (!options?.silent) {
-                console.log(`Running validator [${rule.constructor.name}]`)
+                console.log(`Running validator [${rule.name}]`)
             }
 
             const result = rule.validate(this.ast)
