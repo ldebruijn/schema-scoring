@@ -5,7 +5,7 @@
   },
   "scripts": {
     "build": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-x64 ./index.ts --outfile schema-score",
-    "build:all": "npm run build:linux-x64 && npm run build:linux-x64-musl && npm run build:linux-arm64 && npm run build:darwin-x64 && npm run build:darwin-arm64 && npm run build:windows-x64",
+    "build:all": "bun build:linux-x64 && bun build:linux-x64-musl && bun build:linux-arm64 && bun build:darwin-x64 && bun build:darwin-arm64 && bun build:windows-x64",
     "build:linux-x64": "bun build index.ts --compile --target=bun-linux-x64 --outfile schema-score-linux-x64",
     "build:linux-x64-musl": "bun build index.ts --compile --target=bun-linux-x64-musl --outfile schema-score-linux-x64-musl",
     "build:linux-arm64": "bun build index.ts --compile --target=bun-linux-arm64 --outfile schema-score-linux-arm64",
