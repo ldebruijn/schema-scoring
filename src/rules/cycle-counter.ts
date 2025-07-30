@@ -1,5 +1,5 @@
 import {type DocumentNode, visit} from "graphql";
-import {Rule, ValidationResult} from "../model.ts";
+import {Rule, ValidationResult, Violation} from "../model.ts";
 
 export class CycleCounterRule implements Rule {
     name = "Cycle Counter";
@@ -20,9 +20,17 @@ export class CycleCounterRule implements Rule {
         // Find all unique cycles
         const cycles = this.findUniqueCycles();
 
+        const violations: Violation[] = cycles.map(cycle => ({
+            message: `Circular dependency detected: ${cycle.join(' -> ')}`,
+            location: {
+                coordinate: cycle.join(' -> '),
+                type: cycle[0]
+            }
+        }));
+
         return {
             rule: this.name,
-            violations: cycles.length,
+            violations: violations,
             message: `Found ${cycles.length} cycles in the schema.`
         };
     }

@@ -1,19 +1,25 @@
 import {type DocumentNode, visit} from "graphql";
-import {Rule, ValidationResult} from "../model.ts";
+import {Rule, ValidationResult, Violation} from "../model.ts";
 
 export class DeprecationRule implements Rule {
     name = "Deprecation";
     weight = 5;
 
     validate(ast: DocumentNode): ValidationResult {
-        let violations = 0;
-        let message = "";
+        const violations: Violation[] = [];
 
         visit(ast, {
-            FieldDefinition(node) {
+            FieldDefinition(node, key, parent, path, ancestors) {
                 if (node.directives) {
                     for (const directive of node.directives) {
                         if (directive.name.value === 'deprecated') {
+                            const typeName = ancestors.find(ancestor => 
+                                ancestor?.kind === 'ObjectTypeDefinition' || 
+                                ancestor?.kind === 'InterfaceTypeDefinition'
+                            )?.name?.value || 'Unknown';
+
+                            let violationMessage = '';
+
                             if (directive.arguments) {
                                 const reasonArg = directive.arguments.find(arg => arg.name.value === 'reason');
                                 if (reasonArg && reasonArg.value.kind === 'StringValue') {
@@ -23,16 +29,26 @@ export class DeprecationRule implements Rule {
                                     const hasMigrationPath = reason.toLowerCase().includes('please migrate to');
 
                                     if (!hasDate || !hasMigrationPath) {
-                                        violations++;
-                                        message += `Field "${node.name.value}" has an invalid deprecation reason.`;
+                                        violationMessage = `Field "${node.name.value}" has an invalid deprecation reason`;
                                     }
                                 } else {
-                                    violations++;
-                                    message += `Field "${node.name.value}" is deprecated without a reason.`;
+                                    violationMessage = `Field "${node.name.value}" is deprecated without a reason`;
                                 }
                             } else {
-                                violations++;
-                                message += `Field "${node.name.value}" is deprecated without a reason.`;
+                                violationMessage = `Field "${node.name.value}" is deprecated without a reason`;
+                            }
+
+                            if (violationMessage) {
+                                violations.push({
+                                    message: violationMessage,
+                                    location: {
+                                        line: node.loc?.startToken.line,
+                                        column: node.loc?.startToken.column,
+                                        field: node.name.value,
+                                        type: typeName,
+                                        coordinate: `${typeName}.${node.name.value}`
+                                    }
+                                });
                             }
                         }
                     }
@@ -43,7 +59,9 @@ export class DeprecationRule implements Rule {
         return {
             rule: this.name,
             violations: violations,
-            message: message || "All deprecations are valid."
+            message: violations.length > 0 
+                ? `Found ${violations.length} invalid deprecations`
+                : "All deprecations are valid."
         };
     }
 }

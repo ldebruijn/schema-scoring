@@ -177,3 +177,5 @@ dist
 *.graphqls
 
 docs
+
+schema-score*

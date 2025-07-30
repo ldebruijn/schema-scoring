@@ -1,5 +1,5 @@
 import {visit} from "graphql";
-import {Rule, ValidationResult} from "../model.ts";
+import {Rule, ValidationResult, Violation} from "../model.ts";
 import {DocumentNode} from "graphql/index";
 
 export class CompositeKeyRule implements Rule {
@@ -12,7 +12,7 @@ export class CompositeKeyRule implements Rule {
     }
 
     validate(ast: DocumentNode): ValidationResult {
-        const violations: any[] = [];
+        const violations: Violation[] = [];
 
         visit(ast, {
             ObjectTypeDefinition: {
@@ -24,9 +24,13 @@ export class CompositeKeyRule implements Rule {
 
                     if (compositeKeyDirectives.length > this.maxCompositeKeys) {
                         violations.push({
-                            type: node.name.value,
-                            compositeKeyCount: compositeKeyDirectives.length,
-                            message: `Type "${node.name.value}" has ${compositeKeyDirectives.length} composite keys, which exceeds the maximum of ${this.maxCompositeKeys}`
+                            message: `Type "${node.name.value}" has ${compositeKeyDirectives.length} composite keys, which exceeds the maximum of ${this.maxCompositeKeys}`,
+                            location: {
+                                line: node.loc?.startToken.line,
+                                column: node.loc?.startToken.column,
+                                type: node.name.value,
+                                coordinate: node.name.value
+                            }
                         });
                     }
                 }
@@ -35,7 +39,7 @@ export class CompositeKeyRule implements Rule {
 
         return {
             rule: this.name,
-            violations: violations.length,
+            violations: violations,
             message: `Found ${violations.length} types with more than ${this.maxCompositeKeys} composite keys.`
         };
     }

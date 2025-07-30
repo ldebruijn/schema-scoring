@@ -1,5 +1,5 @@
 import {type ConstDirectiveNode, type DocumentNode, visit} from "graphql";
-import type {Rule, ValidationResult} from "../model.ts";
+import type {Rule, ValidationResult, Violation} from "../model.ts";
 
 // Helper to identify potential PII field names
 const piiPatterns = [
@@ -29,34 +29,30 @@ export class PiiRule implements Rule {
     weight = 10;
 
     validate(ast: DocumentNode): ValidationResult {
-        const piiFields: { field: string, status: string }[] = [];
-        const nonPiiFields: { field: string, status: string }[] = [];
-
+        const violations: Violation[] = [];
         const self = this;
 
         // Visit all field definitions in the schema
         visit(ast, {
-            FieldDefinition(node) {
-
+            FieldDefinition(node, key, parent, path, ancestors) {
                 const fieldName = node.name.value;
                 const hasPII = node.directives && self.hasPIIDirective(node.directives);
 
-                if (self.isPotentialPIIField(fieldName)) {
-                    if (hasPII) {
-                        piiFields.push({
+                if (self.isPotentialPIIField(fieldName) && !hasPII) {
+                    const typeName = ancestors.find(ancestor => 
+                        ancestor?.kind === 'ObjectTypeDefinition' || 
+                        ancestor?.kind === 'InterfaceTypeDefinition'
+                    )?.name?.value || 'Unknown';
+
+                    violations.push({
+                        message: `Field "${fieldName}" appears to contain PII but is not marked with @pii directive`,
+                        location: {
+                            line: node.loc?.startToken.line,
+                            column: node.loc?.startToken.column,
                             field: fieldName,
-                            status: 'correctly_marked'
-                        });
-                    } else {
-                        nonPiiFields.push({
-                            field: fieldName,
-                            status: 'potentially_missing_pii_directive'
-                        });
-                    }
-                } else if (hasPII) {
-                    piiFields.push({
-                        field: fieldName,
-                        status: 'marked_as_pii'
+                            type: typeName,
+                            coordinate: `${typeName}.${fieldName}`
+                        }
                     });
                 }
             }
@@ -65,8 +61,8 @@ export class PiiRule implements Rule {
         // Generate validation report
         return {
             rule: this.name,
-            violations: nonPiiFields.length,
-            message: `Found ${nonPiiFields.length} fields that are potentially PII but are not marked with the @pii directive.`
+            violations: violations,
+            message: `Found ${violations.length} fields that are potentially PII but are not marked with the @pii directive.`
         };
     }
 

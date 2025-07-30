@@ -1,5 +1,5 @@
 import {type DocumentNode, visit} from "graphql";
-import {Rule, ValidationResult} from "../model.ts";
+import {Rule, ValidationResult, Violation} from "../model.ts";
 
 export class NullBlastRadiusRule implements Rule {
     name = "Null Blast Radius";
@@ -31,9 +31,18 @@ export class NullBlastRadiusRule implements Rule {
 
         const violations = this.identifyViolations(analysis)
 
+        const formattedViolations: Violation[] = violations.map(v => ({
+            message: v.message,
+            location: {
+                coordinate: v.fieldPath,
+                field: v.fieldPath.split('.')[1],
+                type: v.fieldPath.split('.')[0]
+            }
+        }));
+
         return {
             rule: this.name,
-            violations: violations.length,
+            violations: formattedViolations,
             message: `Found ${violations.length} fields with a null blast radius greater than ${this.config.maxBlastRadius}.`
         }
     }
