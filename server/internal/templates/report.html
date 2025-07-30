@@ -1,0 +1,162 @@
+{{define "title"}}Report #{{.Report.ID}} - Schema Score Dashboard{{end}}
+
+{{define "content"}}
+<div class="px-4 py-6 sm:px-0">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li><a href="/" class="text-blue-600 hover:text-blue-800">Dashboard</a></li>
+            <li><span class="text-gray-500">/</span></li>
+            <li class="text-gray-500">Report #{{.Report.ID}}</li>
+        </ol>
+    </nav>
+
+    <!-- Report Header -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+        <div  class="px-4 py-5 sm:px-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Schema Report #{{.Report.ID}}
+                    </h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        {{if .Report.SubgraphName}}{{.Report.SubgraphName}}{{else}}Unknown Subgraph{{end}} •
+                        {{.Report.Timestamp.Format "January 2, 2006 at 15:04 MST"}}
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span id="score-badge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border"
+                          data-score="{{.Report.Score}}">
+                        Score: {{printf "%.1f" .Report.Score}}
+                    </span>
+                    {{if .Report.SubgraphName}}
+                    <a href="/subgraph?name={{.Report.SubgraphName}}"
+                       class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        View History
+                    </a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Stats -->
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Total Fields</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{.Report.TotalFields}}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Weighted Violations</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{printf "%.1f" .Report.TotalWeightedViolations}}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Rules Checked</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{len .Report.RuleResults}}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Rule Results -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Rule Results</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Detailed results for each validation rule</p>
+        </div>
+
+        <div class="divide-y divide-gray-200">
+            {{range .Report.RuleResults}}
+            <div class="px-6 py-5">
+                <div class="flex items-center justify-between mb-3">
+                   <div>
+                       <h4 class="text-sm font-medium text-gray-900">{{.RuleName}}</h4>
+                       <p class="text-sm text-gray-500">{{.Message}}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{if eq .ViolationCount 0}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{end}}">
+                            {{.ViolationCount}} violations
+                        </span>
+                        {{if gt .ViolationCount 0}}
+                        <button onclick="toggleViolations('rule-{{.ID}}')"
+                                class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                            Toggle Details
+                        </button>
+                        {{end}}
+                    </div>
+                </div>
+
+                {{if gt .ViolationCount 0}}
+                <div id="rule-{{.ID}}" class="hidden mt-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h5 class="text-xs font-medium text-gray-700 mb-3 uppercase tracking-wide">
+                            Violations ({{.ViolationCount}})
+                        </h5>
+                        <div class="space-y-3">
+                            {{range .Violations}}
+                            <div class="bg-white border border-gray-200 rounded-md p-3">
+                                <div class="text-sm text-gray-900 mb-2">{{.Message}}</div>
+                                {{if or .LocationLine .LocationField .LocationCoordinate}}
+                                <div class="text-xs text-gray-500 space-y-1">
+                                    {{if .LocationCoordinate}}
+                                    <div><strong>Location:</strong> {{.LocationCoordinate}}</div>
+                                    {{end}}
+                                    {{if .LocationLine}}
+                                    <div><strong>Line:</strong> {{.LocationLine}}{{if .LocationColumn}}, Column:
+                                        {{.LocationColumn}}{{end}}
+                                    </div>
+                                    {{end}}
+                                    {{if and .LocationType .LocationField}}
+                                    <div><strong>Field:</strong> {{.LocationType}}.{{.LocationField}}</div>
+                                    {{end}}
+                                </div>
+                                {{end}}
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="px-4 py-5 text-center text-gray-500">
+                No rule results found.
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Metadata (if available) -->
+    {{if .Report.Metadata}}
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mt-6">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Metadata</h3>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5">
+            <pre class="text-sm text-gray-900 bg-gray-50 p-4 rounded-lg overflow-x-auto">{{printf "%s" .Report.Metadata}}</pre>
+        </div>
+    </div>
+    {{end}}
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+    // Apply score classes after page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const el = document.getElementById('score-badge')
+        const score = el.getAttribute('data-score')
+
+        el.classList.add(...getScoreClass(score));
+    });
+
+    function toggleViolations(ruleId) {
+        const element = document.getElementById(ruleId);
+        if (element.classList.contains('hidden')) {
+            element.classList.remove('hidden');
+        } else {
+            element.classList.add('hidden');
+        }
+    }
+</script>
+{{end}}

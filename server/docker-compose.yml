@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: schema_score
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+#  schema-score-server:
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      DB_HOST: postgres
+#      DB_PORT: 5432
+#      DB_USER: postgres
+#      DB_PASSWORD: postgres
+#      DB_NAME: schema_score
+#      DB_SSLMODE: disable
+#      PORT: 8080
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    volumes:
+#      - ./internal/templates:/root/internal/templates
+#      - ./internal/static:/root/internal/static
+
+volumes:
+  postgres_data:

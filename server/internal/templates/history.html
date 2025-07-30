@@ -1,0 +1,183 @@
+{{define "title"}}{{.SubgraphName}} History - Schema Score Dashboard{{end}}
+
+{{define "content"}}
+<div class="px-4 py-6 sm:px-0">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li><a href="/" class="text-blue-600 hover:text-blue-800">Dashboard</a></li>
+            <li><span class="text-gray-500">/</span></li>
+            <li class="text-gray-500">{{.SubgraphName}}</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:px-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        {{.SubgraphName}} Score History
+                    </h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        Schema scoring history over time
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <!-- Subgraph Selector -->
+                    <select onchange="window.location.href='/subgraph?name='+this.value" 
+                            class="block w-40 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        {{range .Subgraphs}}
+                        <option value="{{.}}" {{if eq . $.SubgraphName}}selected{{end}}>{{.}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Chart -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:px-6">
+            <h4 class="text-md leading-6 font-medium text-gray-900">Score Trend</h4>
+        </div>
+        <div class="px-4 py-5">
+            <canvas id="scoreChart" width="400" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Reports List -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h4 class="text-md leading-6 font-medium text-gray-900">All Reports</h4>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Complete history of schema scoring reports</p>
+        </div>
+        
+        <ul class="divide-y divide-gray-200">
+            {{range .Reports}}
+            <li class="px-4 py-4 hover:bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border" data-score="{{.Score}}">
+                                {{printf "%.1f" .Score}}
+                            </span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">
+                                Report #{{.ID}}
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                {{.TotalFields}} fields • {{printf "%.1f" .TotalWeightedViolations}} violations
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-500">{{.Timestamp.Format "Jan 2, 15:04"}}</span>
+                        <a href="/report?id={{.ID}}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </li>
+            {{else}}
+            <li class="px-4 py-4 text-center text-gray-500">
+                No reports found for this subgraph.
+            </li>
+            {{end}}
+        </ul>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply score classes after page load
+        document.querySelectorAll('[data-score]').forEach(function(el) {
+            const score = parseFloat(el.getAttribute('data-score'));
+            // Remove any existing score-class- classes
+            el.className = el.className.replace(/score-class-[\d\.-]+/g, '');
+            // Add the appropriate color class
+            el.classList.add(...getScoreClass(score));
+        });
+        // Create chart
+        createScoreChart();
+    });
+
+    function createScoreChart() {
+        const reports = [
+            {{range .Reports}}
+            {
+                id: {{.ID}},
+                score: {{.Score}},
+                timestamp: '{{.Timestamp.Format "2006-01-02T15:04:05Z07:00"}}',
+                fields: {{.TotalFields}},
+                violations: {{.TotalWeightedViolations}}
+            },
+            {{end}}
+        ];
+
+        // Reverse to show chronological order
+        reports.reverse();
+
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: reports.map(r => new Date(r.timestamp).toLocaleDateString()),
+                datasets: [{
+                    label: 'Schema Score',
+                    data: reports.map(r => r.score),
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Score'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                const report = reports[context.dataIndex];
+                                return [
+                                    `Fields: ${report.fields}`,
+                                    `Violations: ${report.violations.toFixed(1)}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                onClick: function(event, elements) {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const reportId = reports[index].id;
+                        window.location.href = `/report?id=${reportId}`;
+                    }
+                }
+            }
+        });
+    }
+</script>
+{{end}}

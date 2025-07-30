@@ -1,0 +1,172 @@
+{{define "title"}}Schema Score Dashboard{{end}}
+
+{{define "content"}}
+<div class="px-4 py-8 sm:px-0">
+    <!-- Hero Section -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Schema Health Dashboard</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">Monitor your GraphQL schema quality and track improvements over time</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="text-lg">📊</div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500">Total Reports</dt>
+                            <dd class="text-2xl font-bold text-blue-600">{{.TotalReports}}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="text-lg">🔗</div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500">Active Subgraphs</dt>
+                            <dd class="text-2xl font-bold text-blue-600">{{len .Subgraphs}}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="text-lg">⭐</div>
+                    </div>
+                    <div class="ml-4 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500">Avg Score</dt>
+                            <dd class="text-2xl font-bold text-blue-600" id="avg-score">-</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subgraphs Overview -->
+    <div class="bg-white shadow rounded-lg overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Subgraph Overview</h3>
+            <p class="mt-1 text-sm text-gray-600">Current health status of all monitored services</p>
+        </div>
+        <ul class="divide-y divide-gray-100">
+            {{range .Subgraphs}}
+            <li class="px-6 py-4 hover:bg-gray-50 group">
+                <a href="/subgraph?name={{.Name}}" class="accent-hover">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border score-class-{{.LatestScore}}" data-score="{{.LatestScore}}">
+                                    {{printf "%.1f" .LatestScore}}
+                                </span>
+                            </div>
+                            <div>
+                                <div class="text-base font-medium text-gray-900">
+                                        {{.Name}}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    {{.ReportCount}} reports • {{.LatestReport.Format "Jan 2, 15:04"}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm trend-{{.Trend}}">
+                            {{if eq .Trend "up"}}📈 Up{{else if eq .Trend "down"}}📉 Down{{else}}➡️ Stable{{end}}
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {{else}}
+            <li class="px-6 py-8 text-center">
+                <div class="text-4xl mb-2">📊</div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">Ready to Monitor!</h3>
+                <p class="text-sm text-gray-600">Send your first schema report to get started.</p>
+            </li>
+            {{end}}
+        </ul>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Recent Reports</h3>
+            <p class="mt-1 text-sm text-gray-600">Latest schema scoring results</p>
+        </div>
+        <ul class="divide-y divide-gray-200">
+            {{range .RecentReports}}
+            <li class="px-6 py-4 hover:bg-gray-50">
+                <a href="/report?id={{.ID}}" class="accent-hover">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border score-class-{{.Score}}" data-score="{{.Score}}">
+                                    {{printf "%.1f" .Score}}
+                                </span>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{if .SubgraphName}}{{.SubgraphName}}{{else}}Unknown{{end}}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    {{.TotalFields}} fields • {{printf "%.1f" .TotalWeightedViolations}} violations
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500 ">{{.Timestamp.Format "Jan 2, 15:04"}}</span>
+                                <span class="text-sm font-medium">View Details</span>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {{else}}
+            <li class="px-6 py-4 text-center text-gray-500">
+                No reports found.
+            </li>
+            {{end}}
+        </ul>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+    // Apply score classes after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update all score elements with data-score attribute
+        document.querySelectorAll('[data-score]').forEach(function(el) {
+            const score = parseFloat(el.getAttribute('data-score'));
+            // Remove any existing score-class- classes
+            el.className = el.className.replace(/score-class-[\d\.-]+/g, '');
+            // Add the appropriate color class
+            el.classList.add(...getScoreClass(score));
+        });
+
+        // Calculate and display average score
+        const scores = [{{range .Subgraphs}}{{.LatestScore}},{{end}}];
+        if (scores.length > 0) {
+            const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+            const avgScoreEl = document.getElementById('avg-score');
+            avgScoreEl.textContent = formatScore(avgScore);
+            // Apply color class to average score as well
+            avgScoreEl.className = avgScoreEl.className.replace(/text-blue-600/, '');
+            avgScoreEl.classList.add(getScoreClass(avgScore).replace('bg-', 'text-').replace('-100', '-600'));
+        }
+    });
+</script>
+{{end}}

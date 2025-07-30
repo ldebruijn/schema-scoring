@@ -1,0 +1,275 @@
+{{define "title"}}About Schema Score{{end}}
+
+{{define "content"}}
+<div class="px-4 py-8 sm:px-0">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">About Schema Score</h1>
+            <p class="text-lg text-gray-600">Understanding GraphQL schema health and quality measurement</p>
+        </div>
+
+        <!-- What is Schema Score -->
+        <div class="bg-white shadow rounded-lg mb-8 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 text-blue-600">What is Schema Score?</h2>
+            <p class="text-gray-700 mb-4">
+                Schema Score is a tool designed to help teams get a grip on their GraphQL subgraph schema health. 
+                It provides an objective and measurable way to identify schema quality issues, track improvements over time, 
+                and maintain high standards across your federated GraphQL architecture.
+            </p>
+            <p class="text-gray-700">
+                By analyzing your GraphQL schemas against a comprehensive set of rules, Schema Score gives you actionable 
+                insights into potential problems before they impact your API consumers.
+            </p>
+        </div>
+
+        <!-- How it Works -->
+        <div class="bg-white shadow rounded-lg mb-8 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 text-blue-600">How it Works</h2>
+            
+            <div class="space-y-6">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-sm font-bold text-blue-600">1</span>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900 mb-1">Schema Analysis</h3>
+                        <p class="text-gray-600">Your GraphQL schema is parsed and analyzed against a comprehensive set of validation rules covering best practices, potential performance issues, and design patterns.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-sm font-bold text-blue-600">2</span>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900 mb-1">Violation Detection</h3>
+                        <p class="text-gray-600">Each rule identifies specific violations with precise location information (line numbers, field names, types) to help you quickly locate and fix issues.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-sm font-bold text-blue-600">3</span>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900 mb-1">Scoring & Weighting</h3>
+                        <p class="text-gray-600">Violations are weighted by importance and aggregated into an overall health score (0-100), giving you a clear metric to track improvements over time.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-sm font-bold text-blue-600">4</span>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900 mb-1">Tracking & Monitoring</h3>
+                        <p class="text-gray-600">Results are stored and visualized over time, allowing teams to monitor schema health trends and measure the impact of improvements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Calculation -->
+        <div class="bg-white shadow rounded-lg mb-8 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 text-blue-600">How Scores Are Calculated</h2>
+            
+            <div class="space-y-6">
+                <!-- Formula -->
+                <div>
+                    <h3 class="font-medium text-gray-900 mb-2">Scoring Formula</h3>
+                    <div class="bg-gray-100 rounded p-4 font-mono text-sm mb-3">
+                        <div>For each rule with violations:</div>
+                        <div class="text-blue-600 font-bold">totalWeightedViolations += rule.weight × violations.length^1.5</div>
+                        <div class="mt-2">Final score:</div>
+                        <div class="text-blue-600 font-bold">score = 100 × (1 - (totalWeightedViolations ÷ totalFields))</div>
+                    </div>
+                    <p class="text-gray-600 text-sm">The exponential factor (^1.5) means multiple violations of the same rule have increasingly severe impact.</p>
+                </div>
+
+                <!-- Rule Weights -->
+                <div>
+                    <h3 class="font-medium text-gray-900 mb-3">Rule Weight Categories</h3>
+                    <div class="space-y-3">
+                        <div class="border-l-4 border-red-400 pl-4">
+                            <div class="font-medium text-red-800">Critical Issues (Weight: 15-20)</div>
+                            <div class="text-sm text-gray-600">
+                                <strong>Null Blast Radius (20):</strong> Cascading null failures<br>
+                                <strong>Cycle Counter (15):</strong> Circular dependencies<br>
+                                <strong>Nullable External (15):</strong> Federation issues
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 border-yellow-400 pl-4">
+                            <div class="font-medium text-yellow-800">Important Issues (Weight: 10)</div>
+                            <div class="text-sm text-gray-600">
+                                <strong>PII (10):</strong> Security and privacy concerns<br>
+                                <strong>Problem Union (10):</strong> Type system integrity
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 border-blue-400 pl-4">
+                            <div class="font-medium text-blue-800">Style & Convention Issues (Weight: 5)</div>
+                            <div class="text-sm text-gray-600">
+                                <strong>Boolean Prefix, Plural Collections, Composite Keys, Deprecation:</strong> Best practices and maintainability
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Negative Scores -->
+                <div>
+                    <h3 class="font-medium text-gray-900 mb-2">Understanding Negative Scores</h3>
+                    <div class="bg-red-50 border border-red-200 rounded p-4 mb-3">
+                        <p class="text-red-800 font-medium mb-2">Why do negative scores occur?</p>
+                        <p class="text-red-700 text-sm">
+                            Negative scores happen when <code class="bg-red-100 px-1 rounded">totalWeightedViolations > totalFields</code>. 
+                            This indicates severe schema quality issues that outweigh the schema's size.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded p-4">
+                        <p class="font-medium text-gray-900 mb-2">Example:</p>
+                        <p class="text-sm text-gray-700 mb-2">Schema with 10 fields having 3 Null Blast Radius violations:</p>
+                        <div class="font-mono text-xs bg-white p-3 rounded border">
+                            <div>totalWeightedViolations = 20 × 3^1.5 = 20 × 5.196 = 103.9</div>
+                            <div>score = 100 × (1 - (103.9 ÷ 10)) = 100 × (1 - 10.39) = <span class="text-red-600 font-bold">-939</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Interpretation -->
+                <div>
+                    <h3 class="font-medium text-gray-900 mb-3">Score Interpretation Guide</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <span class="inline-block w-4 h-4 bg-green-500 rounded mr-2"></span>
+                                <span class="text-sm"><strong>90-100:</strong> Excellent quality</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="inline-block w-4 h-4 bg-blue-500 rounded mr-2"></span>
+                                <span class="text-sm"><strong>70-89:</strong> Good quality</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="inline-block w-4 h-4 bg-yellow-500 rounded mr-2"></span>
+                                <span class="text-sm"><strong>50-69:</strong> Needs improvement</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="inline-block w-4 h-4 bg-red-500 rounded mr-2"></span>
+                                <span class="text-sm"><strong>0-49:</strong> Poor quality</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="inline-block w-4 h-4 bg-red-800 rounded mr-2"></span>
+                                <span class="text-sm"><strong>Negative:</strong> Critical issues</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p class="mb-2"><strong>Priority for fixes:</strong></p>
+                            <ol class="list-decimal list-inside space-y-1">
+                                <li>Address high-weight violations first</li>
+                                <li>Focus on rules with multiple violations</li>
+                                <li>Critical issues can rapidly improve scores</li>
+                                <li>Style issues provide incremental gains</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validation Rules -->
+        <div class="bg-white shadow rounded-lg mb-8 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 text-blue-600">Validation Rules</h2>
+            <p class="text-gray-700 mb-4">Schema Score evaluates your GraphQL schema against these key areas:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border border-gray-200 rounded p-4">
+                    <h3 class="font-medium text-gray-900 mb-2">🔒 Security & Privacy</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• PII exposure detection</li>
+                        <li>• Sensitive data patterns</li>
+                    </ul>
+                </div>
+
+                <div class="border border-gray-200 rounded p-4">
+                    <h3 class="font-medium text-gray-900 mb-2">⚡ Performance</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Null blast radius analysis</li>
+                        <li>• Cycle detection</li>
+                        <li>• Composite key validation</li>
+                    </ul>
+                </div>
+
+                <div class="border border-gray-200 rounded p-4">
+                    <h3 class="font-medium text-gray-900 mb-2">🏗️ Design Patterns</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Boolean field naming</li>
+                        <li>• Collection pluralization</li>
+                        <li>• Problem union detection</li>
+                    </ul>
+                </div>
+
+                <div class="border border-gray-200 rounded p-4">
+                    <h3 class="font-medium text-gray-900 mb-2">🔗 Federation</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• External field nullability</li>
+                        <li>• Deprecation management</li>
+                        <li>• Cross-service consistency</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="bg-white shadow rounded-lg mb-8 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 text-blue-600">Benefits</h2>
+            
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <div class="text-lg mr-3">📈</div>
+                    <div>
+                        <strong class="text-gray-900">Objective Measurement:</strong>
+                        <span class="text-gray-600"> Get concrete, numerical scores to track schema quality over time</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="text-lg mr-3">🎯</div>
+                    <div>
+                        <strong class="text-gray-900">Actionable Insights:</strong>
+                        <span class="text-gray-600"> Precise violation locations help you quickly identify and fix issues</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="text-lg mr-3">🔄</div>
+                    <div>
+                        <strong class="text-gray-900">Continuous Improvement:</strong>
+                        <span class="text-gray-600"> Track improvements and prevent regression through automated monitoring</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="text-lg mr-3">👥</div>
+                    <div>
+                        <strong class="text-gray-900">Team Alignment:</strong>
+                        <span class="text-gray-600"> Shared metrics help teams maintain consistent quality standards</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Getting Started -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 text-blue-600">Getting Started</h2>
+            <div class="space-y-3 text-gray-700">
+                <p><strong>1. Install the schema scorer:</strong> Add the schema scoring tool to your project</p>
+                <p><strong>2. Configure reporting:</strong> Set up automatic report submission to this dashboard</p>
+                <p><strong>3. Integrate with CI/CD:</strong> Run schema scoring as part of your deployment pipeline</p>
+                <p><strong>4. Monitor & improve:</strong> Use the dashboard to track trends and prioritize improvements</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
