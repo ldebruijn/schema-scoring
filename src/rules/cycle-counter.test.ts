@@ -20,7 +20,7 @@ describe('GraphQLCycleCounter', () => {
     `;
 
         const result = counter.validate(parse(schema));
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 
     test('should count multiple distinct cycles', () => {
@@ -38,7 +38,7 @@ describe('GraphQLCycleCounter', () => {
     `;
 
         const result = counter.validate(parse(schema));
-        expect(result.violations).toBe(2);
+        expect(result.violations.length).toBe(2);
     });
 
     test('should identify complex interconnected cycles', () => {
@@ -59,7 +59,7 @@ describe('GraphQLCycleCounter', () => {
 
         const result = counter.validate(parse(schema));
 
-        expect(result.violations).toBe(3);
+        expect(result.violations.length).toBe(3);
     });
 
     test('should count self-referential cycle', () => {
@@ -71,7 +71,7 @@ describe('GraphQLCycleCounter', () => {
     `;
 
         const result = counter.validate(parse(schema));
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 
     test('should handle nested cycles', () => {
@@ -91,7 +91,7 @@ describe('GraphQLCycleCounter', () => {
     `;
 
         const result = counter.validate(parse(schema));
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 
     test('should return zero cycles for acyclic schema', () => {
@@ -108,6 +108,6 @@ describe('GraphQLCycleCounter', () => {
     `;
 
         const result = counter.validate(parse(schema));
-        expect(result.violations).toBe(0);
+        expect(result.violations.length).toBe(0);
     });
 });

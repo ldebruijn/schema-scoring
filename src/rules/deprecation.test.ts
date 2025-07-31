@@ -13,7 +13,7 @@ describe("DeprecationRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(0);
+        expect(result.violations.length).toBe(0);
     });
 
     test("should fail for missing date", () => {
@@ -24,7 +24,7 @@ describe("DeprecationRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 
     test("should fail for missing migration path", () => {
@@ -35,7 +35,7 @@ describe("DeprecationRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 
     test("should fail for missing reason", () => {
@@ -46,6 +46,6 @@ describe("DeprecationRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 });

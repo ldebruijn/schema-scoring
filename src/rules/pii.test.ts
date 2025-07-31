@@ -21,7 +21,7 @@ describe('GraphQL PII Field Validator', () => {
 
         const result = pii.validate(ast)
 
-        expect(result.violations).toBe(0);
+        expect(result.violations.length).toBe(0);
     });
 
     test('should identify unmarked PII fields', () => {
@@ -43,6 +43,6 @@ describe('GraphQL PII Field Validator', () => {
 
         const result = pii.validate(ast);
 
-        expect(result.violations).toBe(3);
+        expect(result.violations.length).toBe(3);
     });
 });

@@ -39,7 +39,7 @@ describe('NullBlastRadiusValidator', () => {
 
         const result = validator.validate(parse(schema));
 
-        expect(result.violations).toBe(2);
+        expect(result.violations.length).toBe(2);
     });
 
     test('should handle optional fields correctly', () => {
@@ -61,6 +61,6 @@ describe('NullBlastRadiusValidator', () => {
     `;
 
         const result = validator.validate(parse(schema));
-        expect(result.violations).toBe(0);
+        expect(result.violations.length).toBe(0);
     });
 });

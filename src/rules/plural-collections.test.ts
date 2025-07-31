@@ -13,7 +13,7 @@ describe("PluralCollectionsRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(0);
+        expect(result.violations.length).toBe(0);
     });
 
     test("should fail for singular collection", () => {
@@ -24,6 +24,6 @@ describe("PluralCollectionsRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 });

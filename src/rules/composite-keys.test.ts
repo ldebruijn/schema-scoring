@@ -16,7 +16,7 @@ describe("composite keys", () => {
       `
         const result = validator.validate(parse(schema));
         console.log(result)
-        expect(result.violations).toBe(0)
+        expect(result.violations.length).toBe(0)
     })
 
     test("Valid schema with acceptable number of composite keys", () => {
@@ -33,7 +33,7 @@ describe("composite keys", () => {
       `
 
         const result = validator.validate(parse(schema));
-        expect(result.violations).toBe(0)
+        expect(result.violations.length).toBe(0)
     })
 
     test("Invalid schema with too many composite keys", () => {
@@ -52,7 +52,7 @@ describe("composite keys", () => {
       `
 
         const result = validator.validate(parse(schema));
-        expect(result.violations).toBe(1)
+        expect(result.violations.length).toBe(1)
     })
 
     test("Mixed schema with valid and invalid types", () => {
@@ -76,6 +76,6 @@ describe("composite keys", () => {
       `
 
         const result = validator.validate(parse(schema));
-        expect(result.violations).toBe(1)
+        expect(result.violations.length).toBe(1)
     })
 })

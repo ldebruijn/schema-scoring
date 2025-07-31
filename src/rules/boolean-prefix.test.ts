@@ -13,7 +13,7 @@ describe("BooleanPrefixRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(0);
+        expect(result.violations.length).toBe(0);
     });
 
     test("should fail for incorrectly named boolean", () => {
@@ -24,6 +24,6 @@ describe("BooleanPrefixRule", () => {
         `;
         const ast = parse(schema);
         const result = rule.validate(ast);
-        expect(result.violations).toBe(1);
+        expect(result.violations.length).toBe(1);
     });
 });
